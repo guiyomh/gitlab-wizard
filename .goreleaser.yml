@@ -1,0 +1,65 @@
+# This is an example goreleaser.yaml file with some sane defaults.
+# Make sure to check the documentation at http://goreleaser.com
+project_name: gitlab-wizard
+env:
+  - GO111MODULE=on
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod download
+    # you may remove this if you don't need go generate
+    - go generate ./...
+builds:
+- env:
+  - CGO_ENABLED=0
+archives:
+- replacements:
+    darwin: Darwin
+    linux: Linux
+    windows: Windows
+    386: i386
+    amd64: x86_64
+checksum:
+  name_template: '{{ .ProjectName }}-checksums.txt'
+snapshot:
+  name_template: "{{ .Version }}-SNAPSHOT-{{.ShortCommit}}"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
+nfpms:
+  - 
+    id: gitlab-wizard
+    package_name: gitlab-wizard
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    maintainer: Guillaume CAMUS <guillaume.camus@gmail.com>
+    homepage: https://github.com/guiyomh/gitlab-wizard
+    description: A command-line to help us with gitlab.
+    license: MIT
+    formats:
+      - deb
+      - rpm
+brews:
+  -
+    name: gitlab-wizard
+    github:
+      owner: guiyomh
+      name: gitlab-wizard
+    commit_author:
+      name: Guillaume CAMUS
+      email: guillaume.camus@gmail.com
+    folder: Formula
+    homepage: https://github.com/guiyomh/gitlab-wizard
+    description: A command-line to help us with gitlab.
+    test: |
+      system "#{bin}/gitlab-wizard --version"
+   # skip_upload: true
+release:
+  github:
+    owner: guiyomh
+    name: gitlab-wizard
+  draft: true
+  prerelease: auto
+  name_template: "{{.ProjectName}}-v{{.Version}} {{.Env.USER}}"
